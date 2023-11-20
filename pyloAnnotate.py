@@ -331,8 +331,7 @@ def main():
     parser.add_argument("-t", "--target_gff", type=str, help="target annotation file")
     parser.add_argument("-s", "--segment_size", type=int, 
                         help="chain segment (aligned block) size)")
-    parser.add_argument("-u", "--unlifted", type=bool, default=False, 
-                        action=argparse.BooleanOptionalAction, 
+    parser.add_argument("-u", "--unlifted", action="store_true", 
                         help="annotate unlifted points")
     parser.add_argument("-d", "--distance", type=int, default=0, 
                         help="maximum distance allowed for merging interval blocks")               
