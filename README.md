@@ -1,7 +1,7 @@
 # pyloAnnotate
 A tool for conversion and annotation of genome coordinates
 
-This command line tool consists of a modified version of [_Pyliftover_](https://github.com/konstantint/pyliftover) and a script to retrieve annotation for both query and target coordinates. It can convert a point coordinate like the original _pyliftover_, but it can also take a file with point coordinates or an interval. The result can be filtered with a threshold of aligned chain segment length. Annotation is enabled when annotation files (GFF3 or GTF) are provided. For a point file or interval input, the output is a BED if no annotation files provided or a tab-delimited file otherwise ready for downstream processing. 
+This command line tool consists of a modified version of [_Pyliftover_](https://github.com/konstantint/pyliftover) and a script to retrieve annotation for both query and target coordinates. It can convert a point coordinate like the original _pyliftover_, but it can also take a file with point coordinates or an interval. The result can be filtered with a threshold of aligned chain segment size. Annotation is enabled when annotation files (GFF3 or GTF) are provided. For a point file or interval input, the output is a BED if no annotation files provided or a tab-delimited file otherwise ready for downstream processing. 
 
 Note here we refer UCSC's liftover (chain) terms "target" and "query" as "query" and "target" respectively for being more intuitive. _Pyliftover_ uses "source" for UCSC's "target" and  "target" for "query". Also note that coordinates in a chain file are 0-based, which _Pyliftover_ also uses. Single position (chromosome, position) corresponds to the _start_ position in a BED format (0-based).
 
@@ -18,11 +18,11 @@ Download or copy the scripts into one place.
 ## **Usage**
 
 ```
-python3 pyloAnnotate.py [options] [files] [-s segement_length] [-u] [-d distance]
+python3 pyloAnnotate.py [options] [files] [-s segement_size] [-u] [-d distance]
 ```  
 OR (assuming that the executables are in the PATH)
 ```  
-pyloAnnotate.py [options] [files] [-s segement_length] [-u] [-d distance]
+pyloAnnotate.py [options] [files] [-s segement_size] [-u] [-d distance]
 ```
 
 ### **Required arguments**   
@@ -37,7 +37,7 @@ _-c_&emsp;_--chain_&emsp;&emsp;&emsp;chain file
 
 _-q_&emsp;_--query_gff_&emsp;&emsp;&emsp;&emsp;query annotation file  
 _-t_&emsp; _--target_gff_&emsp;&emsp;&emsp;&emsp;target annotation file   
-_-s_&emsp;_--segment_length_&emsp;length of the segment a point belongs to (an integer)  
+_-s_&emsp;_--segment_size_&emsp;length of the segment a point belongs to (an integer)  
 _-u_&emsp;_--unlifted_&emsp;&emsp;&emsp;&emsp;&emsp;annotate unlifted points (default: False)  
 _-d_&emsp;_--distance_&emsp;&emsp;&emsp;&emsp;&emsp;maximum distance between gaps of query segments allowed when merging (default: 0)
 
@@ -118,7 +118,7 @@ in a file.
 
 A query point without a target (unlifted point) will be written to _stdout_ and numbered in multiple point conversion. The points are saved internally for annotation when requested (_-u_ option).
 
-Full output will be a tab-delimited text file (.txt) consists of 21 fields (columns), 10 for a query point, 10 for its target, and the last field (column) for the segment lengths where the points are in:  
+Full output will be a tab-delimited text file (.txt) consists of 21 fields (columns), 10 for a query point, 10 for its target, and the last field (column) for the segment sizes where the points are in:  
 
 1.	query chromosome
 2.	query start  
@@ -140,13 +140,13 @@ Full output will be a tab-delimited text file (.txt) consists of 21 fields (colu
 18.	target feature strand
 19.	target feature
 20.	target gene name
-21.	segment length
+21.	segment size
 
 Multiple features and gene names will be respectively aggregated into comma-separated strings. Cells without annotation data will be _NaN_ or _NA_ after a tab-delimited file is read into a program (e.g., pandas with Jupyter Notebook).
 
 The output of unlifted point (query) annotation will have ten columns for the query plus one for segement length.
 
-The entries in a result of interval conversion depends on the distance (length of gaps) setting. At default value (0), the program will write out every query segment with corresponding target segments in that interval. The segment lengths are combined into one string.
+The entries in a result of interval conversion depends on the distance (length of gaps) setting. At default value (0), the program will write out every query segment with corresponding target segments in that interval. The segment sizes are combined into one string.
 
 ## **Test data**  
 A small point file (human SNP sites; for test purpose only) and human chromosome 21 to mouse chain (extracted from UCSC hg38ToMm39 chain) are provided. 
