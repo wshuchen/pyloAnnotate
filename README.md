@@ -5,6 +5,8 @@ This command line tool consists of a modified version of [_Pyliftover_](https://
 
 Note here we refer UCSC's liftover (chain) terms "target" and "query" as "query" and "target" respectively for being more intuitive. _Pyliftover_ uses "source" for UCSC's "target" and  "target" for "query". Also note that coordinates in a chain file are 0-based, which _Pyliftover_ also uses. Single position (chromosome, position) corresponds to the _start_ position in a BED format (0-based).
 
+(Update - as the result of a fun exercise, a new version (pyloAnnotateii.py) using implicit interval tree (pyloiitree.py, with tree script adapted from [Heng Li](https://github.com/lh3/cgranges)) was added for faster interval conversion.)
+
 ## **Dependencies**
 
 The program was tested on Python version 3.11. The two required Python packages are:
@@ -26,20 +28,22 @@ pyloAnnotate.py [options] [files] [-s segement_size] [-u] [-d distance]
 ```
 
 ### **Required arguments**   
-_-p_&emsp;_--point_&emsp;&emsp;&emsp;point position (chromosome,position)  
-_-f_&emsp;_--point_file_&emsp; point positions in a file  
-_-i_&emsp;_--interval_&emsp;&emsp;interval positions (chromosome,start,end)  
-_-c_&emsp;_--chain_&emsp;&emsp;&emsp;chain file
+_-p_&emsp;_--point_&emsp;&emsp;&emsp;&emsp;point position (chromosome,position)  
+_-f_&emsp;_--point_file  
+&emsp;&emsp;--interval_file_&emsp;point positions or intervals in a file  
+_-i_&emsp;_--interval_&emsp;&emsp;&emsp;interval positions (chromosome,start,end)  
+_-c_&emsp;_--chain_&emsp;&emsp;&emsp;&emsp;chain file
 
 ( _-p_,_-f_, or _-i_ in one job) 
 
 ### **Optional arguments**
 
-_-q_&emsp;_--query_gff_&emsp;&emsp;&emsp;&emsp;query annotation file  
-_-t_&emsp; _--target_gff_&emsp;&emsp;&emsp;&emsp;target annotation file   
+_-q_&emsp;_--query_gff_&emsp;&emsp;&emsp;query annotation file  
+_-t_&emsp; _--target_gff_&emsp;&emsp;&emsp;target annotation file   
 _-s_&emsp;_--segment_size_&emsp;length of the segment a point belongs to (an integer)  
-_-u_&emsp;_--unlifted_&emsp;&emsp;&emsp;&emsp;&emsp;annotate unlifted points (default: False)  
-_-d_&emsp;_--distance_&emsp;&emsp;&emsp;&emsp;&emsp;maximum distance between gaps of query segments allowed when merging (default: 0)
+_-u_&emsp;_--unlifted_&emsp;&emsp;&emsp;&emsp;annotate unlifted points (default: False)  
+_-m_&emsp;_--merge_&emsp;&emsp;&emsp;&emsp;merge interval blocks (default: False)  
+_-d_&emsp;_--distance_&emsp;&emsp;&emsp;&emsp;maximum distance between gaps of query segments allowed when merging (default: 0)
 
 ( _-q_ AND _-t_ in one job)  
 
@@ -48,6 +52,8 @@ Annotation files (GFF3 or GTF) can be from ESEMBL, GENCODE, and NCBI. Make sure 
 The _-s_ argument can be supplied with or without _-q_ and _-t_ arguments for a point file. It will reduce the size of output.
 
 When _-u_ argument is given with _-q_ and _-t_ arguments, the program will annotate unlifted points besides lifted ones with slightly increased processing time.
+
+The _-m_ argument is only available for the iitree version.
 
 The _-d_ argument controls the distance between two features allowed to be merged in interval conversion. A larger distance produces a smaller number of entries in the final result. The default is 0. Please refer to [_bedtools_](https://bedtools.readthedocs.io/en/latest/index.html) merge command for more information. The distance can be seen as a gap between query segments in terms of chain, thus _-d_ setting will be the largest gap allowed. It can be supplied with or without annotation files. However, it may be better to merge annoation data in other programs for flexibilty and other considerations. Note that unlifted segment coordinates after a merge only indicate that there are unlifted segments in that interval.
 
@@ -90,8 +96,8 @@ pyloAnnotate.py -f 50hg38SNPs.bed -c hg38chr21ToMm39.over.chain.gz -s 20 >& err
 ```  
 Interval:
 ```
-pyloAnnotate.py -i chr21,14143206,14143300 -c hg38chr21ToMm39.over.chain.gz
-# Write out a BED file with all the query segments in the interval
+pyloAnnotateii.py -i chr21,14143206,14143300 -c hg38chr21ToMm39.over.chain.gz
+# Write out a BED file with all the segments in the interval
 ```
 With annotation files (GENCODE chromosome GTF files with names changed):  
 ```
@@ -109,8 +115,18 @@ pyloAnnotate.py -f 50hg38SNPs.bed -c hg38chr21ToMm39.over.chain.gz -q hg38v44.gt
 ```  
 Interval with annotation and merge:
 ```
-pyloAnnotate.py -i chr21,14143206,14143300 -c hg38chr21ToMm39.over.chain.gz -q hg38v44.gtf -t mm39vM33.gtf -u -d 50 >& err
+pyloAnnotateii.py -i chr21,14143206,14143300 -c hg38chr21ToMm39.over.chain.gz -q hg38v44.gtf -t mm39vM33.gtf -u -m -d 20 >& err
 ```
+
+## **_pyloAnnotate.py_ or _pyloAnnotateii.py_**
+_pyloAnnotate.py_ for points file;  
+_pyloAnnotateii.py_ for interval and interval file.
+
+Changes in _pyloAnnotateii.py_:  
+1. No _-p_ option. A point needs to be specified as an interval:  
+ _-i_ chromosome,start,end.  
+2. Optional _-m_ for merge operation. No by default.
+
 ## **Output**
 
 If no GFF files are provided with _-q_ AND _-t_ options, the program will print out target coordinate(s) for a point like _Pyliftover_, or save the result as a BED file (.bed) for a group of points
