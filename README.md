@@ -1,11 +1,11 @@
 # pyloAnnotate
 A tool for conversion and annotation of genome coordinates
 
-This command line tool consists of a modified version of [_Pyliftover_](https://github.com/konstantint/pyliftover) and a script to retrieve annotation for both query and target coordinates. It can convert a point coordinate like the original _pyliftover_, but it can also take a file with point coordinates or an interval. The result can be filtered with a threshold of aligned chain segment size. Annotation is enabled when annotation files (GFF3 or GTF) are provided. For a point file or interval input, the output is a BED if no annotation files provided or a tab-delimited file otherwise ready for downstream processing. 
+This command line tool consists of a modified version of [_Pyliftover_](https://github.com/konstantint/pyliftover) and scripts to retrieve annotation for both query and target coordinates. The programs can convert a point coordinate like the original _pyliftover_, but they can also take a file with point coordinates or an interval. The result can be filtered with a threshold of aligned chain segment size. Annotation is enabled when annotation files (GFF3 or GTF) are provided. For a point file or interval input, the output is a BED file if no annotation files provided or a tab-delimited file otherwise ready for downstream processing. 
+
+_PyloAnnotate.py_ uses original interval tree of _Pyliftover_, while _pyloAnnotateii.py_ uses implicit interval tree (_pyloiitree.py_, with tree script adapted from [Heng Li](https://github.com/lh3/cgranges)). For large scale conversion, use the former for points and the later for intervals. 
 
 Note here we refer UCSC's liftover (chain) terms "target" and "query" as "query" and "target" respectively for being more intuitive. _Pyliftover_ uses "source" for UCSC's "target" and  "target" for "query". Also note that coordinates in a chain file are 0-based, which _Pyliftover_ also uses. Single position (chromosome, position) corresponds to the _start_ position in a BED format (0-based).
-
-(Update - as the result of a fun exercise, a new version (pyloAnnotateii.py) using implicit interval tree (pyloiitree.py, with tree script adapted from [Heng Li](https://github.com/lh3/cgranges)) was added for faster interval conversion.)
 
 ## **Dependencies**
 
@@ -32,7 +32,7 @@ _-p_&emsp;_--point_&emsp;&emsp;&emsp;&emsp;point position (chromosome,position)
 _-f_&emsp;_--point_file  
 &emsp;&emsp;--interval_file_&emsp;point positions or intervals in a file  
 _-i_&emsp;_--interval_&emsp;&emsp;&emsp;interval positions (chromosome,start,end)  
-_-c_&emsp;_--chain_&emsp;&emsp;&emsp;&emsp;chain file
+_-c_&emsp;_--chain_&emsp;&emsp;&emsp;chain file
 
 ( _-p_,_-f_, or _-i_ in one job) 
 
@@ -43,7 +43,7 @@ _-t_&emsp; _--target_gff_&emsp;&emsp;&emsp;target annotation file
 _-s_&emsp;_--segment_size_&emsp;length of the segment a point belongs to (an integer)  
 _-u_&emsp;_--unlifted_&emsp;&emsp;&emsp;&emsp;annotate unlifted points (default: False)  
 _-m_&emsp;_--merge_&emsp;&emsp;&emsp;&emsp;merge interval blocks (default: False)  
-_-d_&emsp;_--distance_&emsp;&emsp;&emsp;&emsp;maximum distance between gaps of query segments allowed when merging (default: 0)
+_-d_&emsp;_--distance_&emsp;&emsp;&emsp;maximum distance between gaps of query segments allowed when merging (default: 0)
 
 ( _-q_ AND _-t_ in one job)  
 
