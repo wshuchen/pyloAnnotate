@@ -3,7 +3,7 @@ A tool for conversion and annotation of genome coordinates
 
 This command line tool consists of a modified version of [_Pyliftover_](https://github.com/konstantint/pyliftover) and scripts to retrieve annotation for both query and target coordinates. The programs can convert a point coordinate like the original _pyliftover_, but they can also take a file with point coordinates or an interval. The result can be filtered with a threshold of aligned chain segment size. Annotation is enabled when annotation files (GFF3 or GTF) are provided. For a point file or interval input, the output is a BED file if no annotation files provided or a tab-delimited file otherwise ready for downstream processing. 
 
-_PyloAnnotate.py_ uses original interval tree of _Pyliftover_, while _pyloAnnotateii.py_ uses implicit interval tree (_pyloiitree.py_, with tree script adapted from [Heng Li](https://github.com/lh3/cgranges)). For large scale conversion, use the former for points and the later for intervals. 
+_PyloAnnotate.py_ uses original interval tree of _Pyliftover_, while _pyloAnnotateii.py_ uses implicit interval tree (_pyloiitree.py_, with tree script adapted from [Heng Li](https://github.com/lh3/cgranges)). While both work for point or interval conversion, for large dataset, it is best to use the former for points and the later for intervals. 
 
 Note here we refer UCSC's liftover (chain) terms "target" and "query" as "query" and "target" respectively for being more intuitive. _Pyliftover_ uses "source" for UCSC's "target" and  "target" for "query". Also note that coordinates in a chain file are 0-based, which _Pyliftover_ also uses. Single position (chromosome, position) corresponds to the _start_ position in a BED format (0-based).
 
