@@ -76,7 +76,7 @@ chr1&emsp;72291&emsp;72292
 chr3&emsp;61745213&emsp;61745214  
 chr3&emsp;82091822&emsp;82091823
 
-### **interval coordinate format**
+### **Interval coordinate format**
 
 Interval positions on command line should be comma-separated without space:  
 
